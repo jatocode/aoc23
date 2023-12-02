@@ -22,15 +22,9 @@ lines.forEach(line => {
             gamepossible = false
         }
         // del 2
-        if (cols[0] > bestset[0]) {
-            bestset[0] = cols[0]
-        }
-        if (cols[1] > bestset[1]) {
-            bestset[1] = cols[1]
-        }
-        if (cols[2] > bestset[2]) {
-            bestset[2] = cols[2]
-        }
+        bestset[0] = cols[0] > bestset[0] ? cols[0] : bestset[0]
+        bestset[1] = cols[1] > bestset[1] ? cols[1] : bestset[1]
+        bestset[2] = cols[2] > bestset[2] ? cols[2] : bestset[2]
     })
     powersum += bestset[0] * bestset[1] * bestset[2]
 
