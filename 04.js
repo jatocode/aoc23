@@ -12,16 +12,16 @@ lines.forEach((line, y) => {
     const winnums = win.split(' ').map(n => parseInt(n)).filter(n => !isNaN(n))
     const mynums = my.split(' ').map(n => parseInt(n)).filter(n => !isNaN(n))
 
-    cards.push({ card, winnums, mynums, winning: 0 })
-
-    for (card in mynums) {
-        for (num in mynums[card]) {
-            if (winnums.includes(num)) {
-                console.log('win', card, num)
-                mynums[card].winning += 1
-            }
+    let winning = 0
+    for (num of mynums) {
+        if (winnums.includes(num)) {
+            winning = winning == 0 ? 1 : winning * 2
         }
     }
+
+    cards.push({ winnums, mynums, winning })
 })
 
-console.table(cards)
+//console.table(cards)
+const total = cards.reduce((acc, card) => acc + card.winning, 0)
+console.log('Del 1', total)
