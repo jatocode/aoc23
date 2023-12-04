@@ -1,4 +1,3 @@
-const { getServers } = require('dns')
 const fs = require('fs')
 const args = process.argv.slice(2)
 
@@ -6,7 +5,7 @@ const data = fs.readFileSync(args[0], 'utf8')
 const lines = data.split('\n')
 
 let cards = []
-lines.forEach((line, y) => {
+lines.forEach(line => {
     let [card, numbers] = line.split(':')
     let [win, my] = numbers.split('|')
     const winnums = win.split(' ').map(n => parseInt(n)).filter(n => !isNaN(n))
