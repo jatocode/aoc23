@@ -6,45 +6,62 @@ const data = fs.readFileSync(args[0], 'utf8')
 const lines = data.split('\n')
 
 let state = 0
-let seeds = null
+let seedsPart1 = null
+let seedsPart2 = []
 let seedmap = []
-lines.forEach((line, y) => {
+lines.forEach(line => {
     state = getState(line)
     if (state > 0) {
         const mapdata = line.match(/(\d+) (\d+) (\d+)/)
         if (mapdata) {
             const [_, d, s, r] = mapdata
             if (!seedmap[state]) seedmap[state] = []
-            seedmap[state].push({ s:parseInt(s), d:parseInt(d), r:parseInt(r) })
+            seedmap[state].push({ s: parseInt(s), d: parseInt(d), r: parseInt(r) })
         }
     }
 })
 
-let lowest = Number.MAX_SAFE_INTEGER
-seeds.forEach(seed => {
-    let sm = seed
-    let path = seed + " -> "
-    for (let i = 1; i<seedmap.length ; i++) {
-        for(let j=0; j<seedmap[i].length; j++) {
-            let map = seedmap[i][j]
-            const diff = sm - map.s
-            if(diff >= 0 && diff <= map.r) {
-                sm = map.d + diff
-                break
+
+function findLowestLocation(seeds) {
+    let lowest = Number.MAX_SAFE_INTEGER
+
+    seeds.forEach(seed => {
+        for (let smr = seed.start; smr <= seed.start + seed.range; smr++) {
+            //console.log('Seed: ' + smr, seed.range)
+            let sm = smr
+            let path = sm + " -> "
+
+            for (let i = 1; i < seedmap.length; i++) {
+                for (let j = 0; j < seedmap[i].length; j++) {
+                    let map = seedmap[i][j]
+                    const diff = sm - map.s
+                    if (diff >= 0 && diff <= map.r) {
+                        sm = map.d + diff
+                        break
+                    }
+                }
+                path += sm + " -> "
             }
+            if (sm < lowest) lowest = sm
+            path += sm
+            //console.log(path)
         }
-        path += sm + " -> "
-    }
-    if(sm < lowest) lowest = sm
-    path += sm
-    //console.log(path)
-})
-console.log('Del 1: ' + lowest)
+    })
+    return lowest
+}
+console.log('Del 1: ' + findLowestLocation(seedsPart1))
+console.log('Del 2: ' + findLowestLocation(seedsPart2))
 
 function getState(line) {
     let m = line.match(/seeds: (.*)/)
     if (m) {
-        seeds = m[1].split(' ').map(x => parseInt(x))
+        const seeds = m[1].split(' ').map(x => parseInt(x))
+        seedsPart1 = seeds.map(x => { return { start: x, range: 0 } })
+        for (let i = 0; i < seeds.length; i += 2) {
+            const start = seeds[i]
+            const range = seeds[i + 1]
+            seedsPart2.push({ start, range })
+        }
         return 0
     }
     m = line.match(/seed-to-soil map:/)
@@ -65,23 +82,3 @@ function getState(line) {
     return state
 }
 
-// switch (state) {
-//     case 2:
-//         console.log('seed-to-soil map:')
-//         break
-//     case 3:
-//         console.log('soil-to-fertilizer map:')
-//         break
-//     case 4:
-//         console.log('fertilizer-to-water map:')
-//         break
-//     case 5:
-//         console.log('light-to-temperature map:')
-//         break
-//     case 6:
-//         console.log('temperature-to-humidity map:')
-//         break
-//     case 7:
-//         console.log('humidity-to-location map:')
-//         break
-// }
