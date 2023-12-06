@@ -17,14 +17,9 @@ lines.forEach(line => {
 
 boats.forEach(boat => {
     for(let t=0; t<boat.time; t++) {
-        const dist = distance(t, boat.time)
-        if(dist > boat.record) {
-            //console.log('Boat ' + boat.time + ' beat record ' + boat.record + ' at time ' + t)
-            boat.recordbreak = boat.recordbreak + 1
-        }
+        if(distance(t, boat.time) > boat.record)  boat.recordbreak = boat.recordbreak + 1
     }
 })
-console.log(boats)
 console.log("Del 1: " + boats.reduce((acc, boat) => acc * boat.recordbreak, 1))
 
 function distance(hold, totaltime) {
