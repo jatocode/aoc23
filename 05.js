@@ -1,4 +1,3 @@
-const { getServers } = require('dns')
 const fs = require('fs')
 const args = process.argv.slice(2)
 
@@ -25,7 +24,8 @@ lines.forEach(line => {
 function findLowestLocation(seeds) {
     let lowest = Number.MAX_SAFE_INTEGER
 
-    seeds.forEach(seed => {
+    seeds.forEach((seed,s) => {
+        console.log('Checking seed: ' + (s + 1) + ' of ' + seeds.length + ' time:' + new Date().toLocaleTimeString())
         for (let smr = seed.start; smr <= seed.start + seed.range; smr++) {
             //console.log('Seed: ' + smr, seed.range)
             let sm = smr
@@ -56,7 +56,7 @@ function getState(line) {
     let m = line.match(/seeds: (.*)/)
     if (m) {
         const seeds = m[1].split(' ').map(x => parseInt(x))
-        seedsPart1 = seeds.map(x => { return { start: x, range: 0 } })
+        seedsPart1 = seeds.map(start => { return { start, range: 0 } })
         for (let i = 0; i < seeds.length; i += 2) {
             const start = seeds[i]
             const range = seeds[i + 1]
