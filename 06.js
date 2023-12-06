@@ -30,7 +30,7 @@ console.log("Del 1: " + boats1.reduce((acc, boat) => acc * boat.recordbreak, 1))
 //const boatspart2 = [{ time: 71530, record: 940200, recordbreak: 0 }]
 const boatspart2 = [{ time: 53897698, record: 313109012141201, recordbreak: 0 }]
 const boats2 = calcDistance(boatspart2)
-console.log("Del 2: " + boats2.reduce((acc, boat) => acc * boat.recordbreak, 1))
+console.log("Del 2: " + boats2[0].recordbreak)
 
 function distance(hold, totaltime) {
     const speed = hold * 1
