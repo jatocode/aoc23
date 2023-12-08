@@ -9,15 +9,14 @@ const instructions = lines[0].split('')
 let map = new Map()
 for(let i = 2; i < lines.length; i++) {
     const m = lines[i].match(/(\w+) = \((\w+), (\w+)\)/)
-    if(m) map.set(m[1], {R: m[2], L: m[3]})
+    if(m) map.set(m[1], {L: m[2], R: m[3]}) 
+    else console.log('error', lines[i])
 }
-
 const end = 'ZZZ'
 let next = 'AAA'
 let step = 0
 while (next != end) {
     const inst = instructions[step++ % instructions.length]
-    console.log(next, inst)
     const current = map.get(next)
     if(inst === 'R') next = current.R
     else if(inst === 'L') next = current.L
