@@ -5,12 +5,17 @@ const data = fs.readFileSync(args[0], 'utf8')
 const lines = data.split('\n')
 
 let total = 0
+let total2 = 0
+
 lines.forEach(line => {
   const seq = line.split(' ').map(x => parseInt(x))
+  const seqr = line.split(' ').map(x => parseInt(x)).reverse()
   total += nextNumber(seq)
+  total2 += nextNumber(seqr)
 })
 
 console.log('Del 1: ' + total)
+console.log('Del 2: ' + total2)
 
 function nextNumber(sequence) {
   const diffs = getDiffs(sequence)
