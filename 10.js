@@ -9,7 +9,6 @@ let grid = []
 lines.forEach((line, i) => {
   grid.push(line.split(''))
 })
-console.table(grid)
 
 /*
 | is a vertical pipe connecting north and south.
@@ -29,7 +28,6 @@ console.log('Del 1:', findPath(start))
 
 function findPath(start) {
   const startnb = getNeighbours(start)[0]
-  //getNeighbours(start).forEach(startnb  => {
   const queue = [startnb]
   const camefrom = {}
 
@@ -51,24 +49,19 @@ function findPath(start) {
   camefrom[[start.x, start.y]] = { x: current.x, y: current.y }
 
   let crt = camefrom[[start.x, start.y]]
-  let step = 0
-  let stepgrid = []
+  let step = 1
+  //let stepgrid = []
 
-  stepgrid[start.y] = []
-  stepgrid[start.y][start.x] = step++
+  //stepgrid[start.y] = []
+  //stepgrid[start.y][start.x] = step++
   while (!(crt.x === start.x && crt.y === start.y)) {
-    if (!stepgrid[crt.y]) stepgrid[crt.y] = []
-    // if(stepgrid[crt.y][crt.x] > 0) {
-    //   console.log('Found max:', Math.max(stepgrid[crt.y][crt.x], step))
-    //   break
-    // } else {
-    stepgrid[crt.y][crt.x] = step++
-    //}
+    //if (!stepgrid[crt.y]) stepgrid[crt.y] = []
+    //stepgrid[crt.y][crt.x] = step++
     crt = camefrom[[crt.x, crt.y]]
+    step++
   }
 
-  console.table(stepgrid)
-  //})
+  //console.table(stepgrid)
   return step / 2
 }
 
