@@ -30,28 +30,53 @@ for (let y = 0; y < universe.length; y++) {
   // om vi får expandera i y-led, skjut in en extra tomrad, annars bara originalraden
   const expandedx = expandx(universe[y], xexpands)
   expanded.push(expandedx)
-  if(yexpand) expanded.push(expandedx)
+  if(yexpand) expanded.push(expandedx.join('').replace(/\./g, '*').split(''))
 }
 const galaxies = countGalaxies(expanded)
 const galaxypairs = getPairs(galaxies)
 printUniverse(expanded)
 const total = galaxypairs.reduce((acc, pair) => acc + getDistance(pair[0], pair[1]), 0)
-
 console.log('Del 1:', total)
+
+const total2 = galaxypairs.reduce((acc, pair) => acc + getDistance(pair[0], pair[1], 1000000-1), 0)
+console.log('Del 2:', total2)
+
 
 function expandx(line, xexpands) {
   let newline = [...line]
   xexpands.forEach((xp,i) => {
-    newline.splice(xp + i, 0, '.')
+    newline.splice(xp + i, 0, '*')
   })
-  //console.log(line.join(''), '->', newline.join(''), line.length, newline.length)
   return newline
 }
 
-function getDistance(galaxy1, galaxy2) {
+function getDistance(galaxy1, galaxy2, expandsize = 1) {
   let gx1 = galaxies[galaxy1]
   let gx2 = galaxies[galaxy2]
-  return Math.abs(gx1.x - gx2.x) + Math.abs(gx1.y - gx2.y)
+
+  const expands = getExpands(galaxy1, galaxy2)
+  let dist = Math.abs(gx1.x - gx2.x) + Math.abs(gx1.y - gx2.y)
+  return dist - expands + (expands * expandsize)
+}
+
+function getExpands(galaxy1, galaxy2) {
+  let gx1 = galaxies[galaxy1]
+  let gx2 = galaxies[galaxy2]
+  let xdir = gx1.x < gx2.x ? 1 : -1
+  let ydir = gx1.y < gx2.y ? 1 : -1
+
+  let expands = 0
+  for(let x = gx1.x; x != gx2.x; x += xdir) {
+    if(expanded[gx1.y][x] === '*') {
+      expands++
+    }
+  }
+  for(let y = gx1.y; y != gx2.y; y += ydir) {
+    if(expanded[y][gx1.x] === '*') {
+      expands++
+    }
+  }
+  return expands
 }
 
 function getPairs(galaxies) {
@@ -75,7 +100,6 @@ function countGalaxies(universe) {
       }
     }
   }
-  console.table(galaxies)
   return galaxies
 }
 
