@@ -22,15 +22,14 @@ console.log('Del 2:', total2)
 function expandUniverse(universe) {
   let xexpands = []
   for (let x = 0; x < universe[0].length; x++) {
-    let xline = ''
+    let empty = true
     for (let y = 0; y < universe.length; y++) {
-      xline += universe[y] == undefined ? '.' : universe[y][x]
       if (universe[y][x] === '#') {
+        empty = false
         break
       }
     }
-    const xexpand = xline.indexOf('#') == -1
-    if (xexpand) xexpands.push(x)
+    if(empty) xexpands.push(x)
   }
   let yexpands = []
   for (let y = 0; y < universe.length; y++) {
@@ -58,7 +57,7 @@ function getDistance(galaxy1, galaxy2, expandlist, expandsize = 1) {
   let dist = Math.abs(gx1.x - gx2.x) + Math.abs(gx1.y - gx2.y)
 
   // Och lägg till expansionsstorleken
-  return dist + (expands * expandsize-1)
+  return dist + (expands * expandsize)
 }
 
 function getPairs(galaxies) {
