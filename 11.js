@@ -21,21 +21,29 @@ console.log('Del 2:', total2)
 
 function expandUniverse(universe) {
   let xexpands = []
+  let yexpands = []
+  let ywithgalaxy = []
+
+  for (let y = 0; y < universe.length; y++) {
+    const yempty = universe[y].find((e) => e === '#') == undefined
+    if (yempty) 
+      yexpands.push(y)
+    else 
+      ywithgalaxy.push(y)
+  }
+
   for (let x = 0; x < universe[0].length; x++) {
-    let empty = true
-    for (let y = 0; y < universe.length; y++) {
+    let xempty = true
+    for (let yi = 0; yi < ywithgalaxy.length; yi++) {
+      const y = ywithgalaxy[yi]
       if (universe[y][x] === '#') {
-        empty = false
+        xempty = false
         break
       }
     }
-    if(empty) xexpands.push(x)
+    if(xempty) xexpands.push(x)
   }
-  let yexpands = []
-  for (let y = 0; y < universe.length; y++) {
-    const yexpand = universe[y].find((e) => e === '#') == undefined
-    if (yexpand) yexpands.push(y)
-  }
+
 
   return [xexpands, yexpands]
 }
