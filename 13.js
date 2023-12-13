@@ -18,6 +18,7 @@ patterns.push(mirrors)
 
 let tot = 0
 patterns.forEach((pattern,i) => {
+  // Skulle kunna refaktoriseras till en funktion men orkar inte
   const v = vertMirror(pattern)
   const h =  horizMirror(pattern)
   tot += v + h * 100
@@ -25,9 +26,8 @@ patterns.forEach((pattern,i) => {
 console.log('Del 1:', tot)
 
 function horizMirror(pattern) {
-  let mirror = 0
   for (let i = 0; i < pattern.length; i++) {
-    mirror = 0
+    let errors = 0
     for (let j = 0; j < pattern.length; j++) {
       const p = i - j
       const n = i + j + 1
@@ -36,14 +36,12 @@ function horizMirror(pattern) {
 
       let line = pattern[p] ? pattern[p].join('') : undefined
       let nextline = pattern[n] ? pattern[n].join('') : undefined
-      //console.log(p + 1, n + 1, line, nextline)
       if (line !== nextline) {
-        mirror = 0
+        errors++
         break
       }
-      mirror++
     }
-    if (mirror > 1) {
+    if (i < pattern.length - 1 && errors == 0) {
       return i+1
     }
   }
@@ -51,25 +49,22 @@ function horizMirror(pattern) {
 }
 
 function vertMirror(pattern) {
-  let mirror = 0
   for (let i = 0; i < pattern[0].length; i++) {
-    mirror = 0
+    let errors = 0
     for (let j = 0; j < pattern[0].length; j++) {
       const p = i - j
       const n = i + j + 1
 
-      if (p < 0 || n >= pattern.length) break
+      if (p < 0 || n >= pattern[0].length) break
 
       let line = pattern.reduce((acc, row) => acc + row[p], '')
       let nextline = pattern.reduce((acc, row) => acc + row[n], '')
-      //console.log('v', p + 1, n + 1, line, nextline)
       if (line !== nextline) {
-        mirror = 0
+        errors++
         break
       }
-      mirror++
     }
-    if (mirror > 1) {
+    if (i < pattern[0].length-1 && errors == 0) {
       return i+1
     }
   }
