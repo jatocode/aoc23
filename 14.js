@@ -8,6 +8,7 @@ let rocks = []
 lines.forEach(line => {
   rocks.push(line.split(''))
 })
+console.table(rocks)
 printRocks(rocks)
 shiftNorth(rocks)
 printRocks(rocks)
@@ -53,12 +54,16 @@ function rollRock(x,y) {
 }
 
 function printRocks(rocks) {
+  let nrocks = 0
   console.log('----------------------')
   for (let y = 0; y < rocks.length; y++) {
     let row = ''
     for (let x = 0; x < rocks[y].length; x++) {
       row += rocks[y][x]
+      if(rocks[y][x] == 'O') nrocks++
     }
+    row += ' ' + (rocks.length - y) 
     console.log(row)
   }
+  console.log('Rocks', nrocks)
 }
