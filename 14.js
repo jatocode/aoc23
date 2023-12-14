@@ -8,9 +8,9 @@ let rocks = []
 lines.forEach(line => {
   rocks.push(line.split(''))
 })
-console.table(rocks)
+printRocks(rocks)
 shiftNorth(rocks)
-console.table(rocks)
+printRocks(rocks)
 console.log('Del 1: ', calcLoad(rocks))
 
 function calcLoad(rocks) {
@@ -49,5 +49,16 @@ function rollRock(x,y) {
       case '#':
         return [x,y]
     } 
+  }
+}
+
+function printRocks(rocks) {
+  console.log('----------------------')
+  for (let y = 0; y < rocks.length; y++) {
+    let row = ''
+    for (let x = 0; x < rocks[y].length; x++) {
+      row += rocks[y][x]
+    }
+    console.log(row)
   }
 }
