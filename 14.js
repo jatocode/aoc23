@@ -8,10 +8,17 @@ let rocks = []
 lines.forEach(line => {
   rocks.push(line.split(''))
 })
-console.table(rocks)
 printRocks(rocks)
-shiftNorth(rocks)
-printRocks(rocks)
+
+for (let cycle = 1; cycle < 4; cycle++) {
+  rollRocks(rocks, 'N')
+  rollRocks(rocks, 'W')
+  rollRocks(rocks, 'S')
+  rollRocks(rocks, 'E')
+  console.log('After cycle', cycle)
+  printRocks(rocks)
+}
+
 console.log('Del 1: ', calcLoad(rocks))
 
 function calcLoad(rocks) {
@@ -19,51 +26,89 @@ function calcLoad(rocks) {
   for (let y = 0; y < rocks.length; y++) {
     for (let x = 0; x < rocks[y].length; x++) {
       if (rocks[y][x] == 'O') {
-        load += (rocks.length - y) 
+        load += (rocks.length - y)
       }
     }
   }
   return load
 }
 
-function shiftNorth(rocks) {
-  for (let y = 0; y < rocks.length; y++) {
-    for (let x = 0; x < rocks[y].length; x++) {
-        rollRock(x,y)
+function rollRocks(rocks, dir = 'N') {
+  if (dir == 'N' ) {
+    for (let y = 0; y < rocks.length; y++) {
+      for (let x = 0; x < rocks[y].length; x++) {
+        rollRock(x, y, dir)
+      }
+    }
+  } else if (dir == 'S') {
+    for (let y = rocks.length - 1; y >= 0; y--) {
+      for (let x = 0; x < rocks[y].length; x++) {
+        rollRock(x, y, dir)
+      }
+    }
+  } else if (dir == 'W') {
+    for (let y = 0; y < rocks.length; y++) {
+      for (let x = 0; x < rocks[y].length; x++) {
+        rollRock(x, y, dir)
+      }
+    }
+  } else if (dir == 'E') {
+    for (let y = 0; y < rocks.length; y++) {
+      for (let x = rocks[y].length - 1; x >= 0; x--) {
+        rollRock(x, y, dir)
+      }
     }
   }
 }
 
-function rollRock(x,y) {
-  if(rocks[y-1] == undefined) {
-    return [x,y]
+function rollRock(x, y, dir) {
+  //console.log('Rolling rock in dir', dir, x, y)
+  const [posx, posy] = overPos(x, y, dir)
+
+  if (rocks[posy] == undefined) {
+    return [x, y]
   }
   if (rocks[y][x] == 'O') {
-    const over = rocks[y-1][x]
-    switch (over) {
+    const next = rocks[posy][posx]
+    //console.log('Rolling rock in dir',dir, x, y, 'to', posx, posy, 'next', next)
+    switch (next) {
       case 'O':
-        return [x,y]
+        return [x, y]
       case '.':
-        rocks[y-1][x] = 'O'
+        rocks[posy][posx] = 'O'
         rocks[y][x] = '.'
-        return rollRock(x,y-1)
+        return rollRock(posx, posy, dir)
       case '#':
-        return [x,y]
-    } 
+        return [x, y]
+      default:
+        return [x, y]
+    }
+  }
+}
+
+function overPos(x, y, dir) {
+  switch (dir) {
+    case 'N':
+      return [x, y - 1]
+    case 'S':
+      return [x, y + 1]
+    case 'W':
+      return [x - 1, y]
+    case 'E':
+      return [x + 1, y]
+    default:
+      console.error('Unknown dir', dir)
   }
 }
 
 function printRocks(rocks) {
-  let nrocks = 0
-  console.log('----------------------')
   for (let y = 0; y < rocks.length; y++) {
     let row = ''
     for (let x = 0; x < rocks[y].length; x++) {
       row += rocks[y][x]
-      if(rocks[y][x] == 'O') nrocks++
     }
-    row += ' ' + (rocks.length - y) 
+    row += '     ' + (rocks.length - y)
     console.log(row)
   }
-  console.log('Rocks', nrocks)
+  console.log()
 }
