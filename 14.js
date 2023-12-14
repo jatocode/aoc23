@@ -5,6 +5,8 @@ const rawdata = fs.readFileSync(args[0], 'utf8')
 const lines = rawdata.split('\n')
 
 let rocks = []
+let cache = new Map()
+
 lines.forEach(line => {
   rocks.push(line.split(''))
 })
@@ -14,17 +16,44 @@ let rocks2 = [...rocks]
 rollRocks(rocks, 'N')
 console.log('Del 1: ', calcLoad(rocks))
 
-for (let cycle = 1; cycle < 1000000000; cycle++) {
-  if(cycle % 1000 == 0) {
-    console.log('Running cycle', cycle, new Date().toLocaleTimeString())
+cache = new Map()
+rocks = [...rocks2]
+part2(1000000000)
+console.log('Del 2: ', calcLoad(rocks))
+
+function part2(cycles) {
+  for (let cycle = 1; cycle <= cycles; cycle++) {
+    rollRocks(rocks, 'N')
+    rollRocks(rocks, 'W')
+    rollRocks(rocks, 'S')
+    rollRocks(rocks, 'E')
+
+    const rk = rocks.toString()
+    if (cache.has(rk)) {
+      const cyclestart = cache.get(rk)
+      const cyclelength = cycle - cyclestart
+      console.log('Cache hit at cycle', cycle, cyclestart, 'length', cyclelength)
+
+      // Borde kunna räkna ut hur många cykler som är kvar?!? Eller?
+      const remaining = (cycles - cyclestart) % cyclelength
+      cycle += remaining * cyclelength
+
+      // const remainingCycles = (cycles - cyclestart) % cyclelength;
+      // for (var i = 0; i < remainingCycles; i++) {
+      //   rollRocks(rocks, 'N')
+      //   rollRocks(rocks, 'W')
+      //   rollRocks(rocks, 'S')
+      //   rollRocks(rocks, 'E')
+      //   return rocks
+      // }
+
+    } else {
+      cache.set(rk, cycle)
+    }
   }
-  rollRocks(rocks2, 'N')
-  rollRocks(rocks2, 'W')
-  rollRocks(rocks2, 'S')
-  rollRocks(rocks2, 'E')
+  return rocks
 }
 
-console.log('Del 2: ', calcLoad(rocks2))
 
 function calcLoad(rocks) {
   let load = 0
@@ -55,15 +84,12 @@ function rollRocks(rocks, dir = 'N') {
 }
 
 function rollRock(x, y, dir) {
-  //console.log('Rolling rock in dir', dir, x, y)
   const [posx, posy] = overPos(x, y, dir)
-
   if (rocks[posy] == undefined) {
     return [x, y]
   }
   if (rocks[y][x] == 'O') {
     const next = rocks[posy][posx]
-    //console.log('Rolling rock in dir',dir, x, y, 'to', posx, posy, 'next', next)
     switch (next) {
       case 'O':
         return [x, y]
@@ -100,7 +126,7 @@ function printRocks(rocks) {
     for (let x = 0; x < rocks[y].length; x++) {
       row += rocks[y][x]
     }
-    row += '     ' + (rocks.length - y)
+    //  row += '     ' + (rocks.length - y)
     console.log(row)
   }
   console.log()
