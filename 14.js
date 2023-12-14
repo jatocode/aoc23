@@ -8,18 +8,23 @@ let rocks = []
 lines.forEach(line => {
   rocks.push(line.split(''))
 })
-printRocks(rocks)
 
-for (let cycle = 1; cycle < 4; cycle++) {
-  rollRocks(rocks, 'N')
-  rollRocks(rocks, 'W')
-  rollRocks(rocks, 'S')
-  rollRocks(rocks, 'E')
-  console.log('After cycle', cycle)
-  printRocks(rocks)
+let rocks2 = [...rocks]
+
+rollRocks(rocks, 'N')
+console.log('Del 1: ', calcLoad(rocks))
+
+for (let cycle = 1; cycle < 1000000000; cycle++) {
+  if(cycle % 1000 == 0) {
+    console.log('Running cycle', cycle, new Date().toLocaleTimeString())
+  }
+  rollRocks(rocks2, 'N')
+  rollRocks(rocks2, 'W')
+  rollRocks(rocks2, 'S')
+  rollRocks(rocks2, 'E')
 }
 
-console.log('Del 1: ', calcLoad(rocks))
+console.log('Del 2: ', calcLoad(rocks2))
 
 function calcLoad(rocks) {
   let load = 0
@@ -34,26 +39,14 @@ function calcLoad(rocks) {
 }
 
 function rollRocks(rocks, dir = 'N') {
-  if (dir == 'N' ) {
+  if (dir == 'N' || dir == 'W') {
     for (let y = 0; y < rocks.length; y++) {
       for (let x = 0; x < rocks[y].length; x++) {
         rollRock(x, y, dir)
       }
     }
-  } else if (dir == 'S') {
+  } else if (dir == 'S' || dir == 'E') {
     for (let y = rocks.length - 1; y >= 0; y--) {
-      for (let x = 0; x < rocks[y].length; x++) {
-        rollRock(x, y, dir)
-      }
-    }
-  } else if (dir == 'W') {
-    for (let y = 0; y < rocks.length; y++) {
-      for (let x = 0; x < rocks[y].length; x++) {
-        rollRock(x, y, dir)
-      }
-    }
-  } else if (dir == 'E') {
-    for (let y = 0; y < rocks.length; y++) {
       for (let x = rocks[y].length - 1; x >= 0; x--) {
         rollRock(x, y, dir)
       }
