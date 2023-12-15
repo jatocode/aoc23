@@ -10,11 +10,36 @@ lines.forEach(line => {
   springs.push({ condition: c, groups: groups.split(',').map(g => parseInt(g)) })
 })
 
+
 springs.forEach(spring => {
-  const variants = createVariants(spring.condition, spring.groups.length, new Map())
+  const variants = createVariants2(spring.condition, spring.groups.length)
   spring.matches = variants.get(spring.groups.map(g => g.toString()).join('-'))
 })
 console.log('Del 1: ', springs.reduce((acc, spring) => acc + spring.matches, 0))
+
+function createVariants2(str, numGroups) {
+  const variants = new Map()
+
+  function permute(chars, permutation) {
+
+    if (chars.length === 0) {
+      countVariant(permutation, numGroups, variants)
+    } else {
+      const char = chars[0];
+      const remainingChars = chars.slice(1);
+      if (char === '?') {
+        permute(remainingChars, permutation + '.');
+        permute(remainingChars, permutation + '#');
+      } else {
+        permute(remainingChars, permutation + char);
+      }
+    }
+  }
+
+  permute(str, '');
+  return variants
+}
+
 
 function createVariants(condition, numGroups, variants) {
   if (!condition.includes('?')) {
