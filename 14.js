@@ -27,7 +27,7 @@ function part2(cycles) {
     rollRocks(rocks, 'W')
     rollRocks(rocks, 'S')
     rollRocks(rocks, 'E')
-
+    //printRocks(rocks)
     const rk = rocks.toString()
     if (cache.has(rk)) {
       const cyclestart = cache.get(rk)
@@ -35,17 +35,17 @@ function part2(cycles) {
       console.log('Cache hit at cycle', cycle, cyclestart, 'length', cyclelength)
 
       // Borde kunna räkna ut hur många cykler som är kvar?!? Eller?
-      const remaining = (cycles - cyclestart) % cyclelength
-      cycle += remaining * cyclelength
+      // const remaining = (cycles - cyclestart) % cyclelength
+      // cycle += remaining * cyclelength
 
-      // const remainingCycles = (cycles - cyclestart) % cyclelength;
-      // for (var i = 0; i < remainingCycles; i++) {
-      //   rollRocks(rocks, 'N')
-      //   rollRocks(rocks, 'W')
-      //   rollRocks(rocks, 'S')
-      //   rollRocks(rocks, 'E')
-      //   return rocks
-      // }
+      const remainingCycles = (cycles - cyclestart) % cyclelength;
+      for (var i = 0; i < remainingCycles; i++) {
+        rollRocks(rocks, 'N')
+        rollRocks(rocks, 'W')
+        rollRocks(rocks, 'S')
+        rollRocks(rocks, 'E')
+        return rocks
+      }
 
     } else {
       cache.set(rk, cycle)
@@ -58,25 +58,41 @@ function part2(cycles) {
 function calcLoad(rocks) {
   let load = 0
   for (let y = 0; y < rocks.length; y++) {
+    let rocksonline = 0
     for (let x = 0; x < rocks[y].length; x++) {
       if (rocks[y][x] == 'O') {
-        load += (rocks.length - y)
+        rocksonline++
       }
     }
+    load += (rocks.length - y) * rocksonline
   }
   return load
 }
 
 function rollRocks(rocks, dir = 'N') {
-  if (dir == 'N' || dir == 'W') {
+  if (dir == 'N') {
     for (let y = 0; y < rocks.length; y++) {
       for (let x = 0; x < rocks[y].length; x++) {
         rollRock(x, y, dir)
       }
     }
-  } else if (dir == 'S' || dir == 'E') {
+  } else if (dir == 'W') {
+    for (let y = 0; y < rocks.length; y++) {
+      for (let x = 0; x < rocks[y].length; x++) {
+        rollRock(x, y, dir)
+      }
+    }
+  }
+  else if (dir == 'S') {
     for (let y = rocks.length - 1; y >= 0; y--) {
       for (let x = rocks[y].length - 1; x >= 0; x--) {
+        rollRock(x, y, dir)
+      }
+    }
+  }
+  else if (dir == 'E') {
+    for (let y = rocks.length - 1; y >= 0; y--) {
+      for (let x = rocks[y].length - 2; x >= 0; x--) {
         rollRock(x, y, dir)
       }
     }
@@ -88,6 +104,7 @@ function rollRock(x, y, dir) {
   if (rocks[posy] == undefined) {
     return [x, y]
   }
+  
   if (rocks[y][x] == 'O') {
     const next = rocks[posy][posx]
     switch (next) {
