@@ -10,46 +10,14 @@ lines.forEach(line => {
   springs.push({ condition: c, groups: groups.split(',').map(g => parseInt(g)) })
 })
 
-springs.forEach((spring, i) => {
-  //let spring = springs[1]
-  const variants = createVariant(spring.condition, []).sort()
-  const matches = matchGroups(variants, spring.groups)
-  spring.matches = matches
+springs.forEach(spring => {
+  const variants = createVariant(spring.condition, spring.groups.length, new Map())
+  spring.matches = variants.get(spring.groups.map(g => g.toString()).join('-'))
 })
-console.table(springs)
 console.log('Del 1: ', springs.reduce((acc, spring) => acc + spring.matches, 0))
 
-function matchGroup(variant, groups, matches = 0) {
-  const numGroups = variant.match(/#+/g)?.length
-  if (numGroups != groups.length) {
-    return matches
-  }
-  const g = groups.shift()
-  if (!g) {
-    return matches
-  }
-  const regex = new RegExp(`(?<!#)#{${g}}(?!#)`)
-  const groupm = variant.match(regex)
-  if (groupm) {
-    index = groupm.index
-    matches = matchGroup(variant.slice(index + g), groups, matches + 1)
-  }
-  return matches
-}
-
-function matchGroups(variants, groups) {
-  let matches = 0
-  variants.forEach(variant => {
-    if (matchGroup(variant, [...groups]) == groups.length) {
-      matches++
-    }
-  })
-  return matches
-}
-
-function createVariant(condition, variants) {
+function createVariant(condition, numGroups, variants) {
   const unknown = condition.match(/\?{1}/)
-
   if (!unknown || unknown.index == undefined) {
     return variants
   }
@@ -62,16 +30,35 @@ function createVariant(condition, variants) {
   const whole = wholea.join('')
 
   if (broken.includes('?')) {
-    createVariant(broken, variants)
+    createVariant(broken, numGroups, variants)
   } else {
-    variants.push(broken)
+    const m = broken.match(/#+/g);
+    if (m != undefined && m.length == numGroups) {
+      const key = m.map(g => g.length).join('-')
+      if (variants.has(key)) {
+        const n = variants.get(key)
+        variants.set(key, n + 1)
+      } else {
+        variants.set(key, 1)
+      }
+    }
   }
 
   if (whole.includes('?')) {
-    createVariant(whole, variants)
+    createVariant(whole, numGroups, variants)
   } else {
-    variants.push(whole)
+    const m = whole.match(/#+/g);
+    if (m != undefined && m.length == numGroups) {
+      const key = m.map(g => g.length).join('-')
+      if (variants.has(key)) {
+        const n = variants.get(key)
+        variants.set(key, n + 1)
+      } else {
+        variants.set(key, 1)
+      }
+    }
   }
 
   return variants
 }
+
