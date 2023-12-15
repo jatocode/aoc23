@@ -27,7 +27,6 @@ function part2(cycles) {
     rollRocks(rocks, 'W')
     rollRocks(rocks, 'S')
     rollRocks(rocks, 'E')
-    //printRocks(rocks)
     const rk = rocks.toString()
     if (cache.has(rk)) {
       const cyclestart = cache.get(rk)
@@ -35,7 +34,7 @@ function part2(cycles) {
       console.log('Cache hit at cycle', cycle, cyclestart, 'length', cyclelength)
 
       // Borde kunna räkna ut hur många cykler som är kvar?!? Eller?
-      // const remaining = (cycles - cyclestart) % cyclelength
+      // const remaining = (cycles - cyclestart) % (cyclelength)
       // cycle += remaining * cyclelength
 
       const remainingCycles = (cycles - cyclestart) % cyclelength;
@@ -44,8 +43,8 @@ function part2(cycles) {
         rollRocks(rocks, 'W')
         rollRocks(rocks, 'S')
         rollRocks(rocks, 'E')
-        return rocks
       }
+      return rocks
 
     } else {
       cache.set(rk, cycle)
@@ -70,6 +69,7 @@ function calcLoad(rocks) {
 }
 
 function rollRocks(rocks, dir = 'N') {
+  //console.log('Rolling: ', dir)
   if (dir == 'N') {
     for (let y = 0; y < rocks.length; y++) {
       for (let x = 0; x < rocks[y].length; x++) {
@@ -92,7 +92,7 @@ function rollRocks(rocks, dir = 'N') {
   }
   else if (dir == 'E') {
     for (let y = rocks.length - 1; y >= 0; y--) {
-      for (let x = rocks[y].length - 2; x >= 0; x--) {
+      for (let x = rocks[y].length - 1; x >= 0; x--) {
         rollRock(x, y, dir)
       }
     }
@@ -138,13 +138,17 @@ function overPos(x, y, dir) {
 }
 
 function printRocks(rocks) {
+  let numrocks = 0
   for (let y = 0; y < rocks.length; y++) {
     let row = ''
     for (let x = 0; x < rocks[y].length; x++) {
       row += rocks[y][x]
+      if(rocks[y][x] == 'O') {
+        numrocks++
+      }
     }
     //  row += '     ' + (rocks.length - y)
     console.log(row)
   }
-  console.log()
+  console.log(numrocks)
 }
