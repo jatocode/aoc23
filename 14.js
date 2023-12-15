@@ -6,22 +6,20 @@ const lines = rawdata.split('\n')
 
 let rocks = []
 let cache = new Map()
+const dirmap = {N:0,S:1,W:2,E:3}
+const dirs = [{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0}]
 
 lines.forEach(line => {
   rocks.push(line.split(''))
 })
 
-let rocks2 = [...rocks]
-
 rollRocks(rocks, 'N')
 console.log('Del 1: ', calcLoad(rocks))
 
 cache = new Map()
-rocks = [...rocks2]
-part2(1000000000)
-console.log('Del 2: ', calcLoad(rocks))
+console.log('Del 2: ', calcLoad(part2(rocks, 1000000000)))
 
-function part2(cycles) {
+function part2(rocks, cycles) {
   for (let cycle = 1; cycle <= cycles; cycle++) {
     rollRocks(rocks, 'N')
     rollRocks(rocks, 'W')
@@ -31,12 +29,6 @@ function part2(cycles) {
     if (cache.has(rk)) {
       const cyclestart = cache.get(rk)
       const cyclelength = cycle - cyclestart
-      console.log('Cache hit at cycle', cycle, cyclestart, 'length', cyclelength)
-
-      // Borde kunna räkna ut hur många cykler som är kvar?!? Eller?
-      // const remaining = (cycles - cyclestart) % (cyclelength)
-      // cycle += remaining * cyclelength
-
       const remainingCycles = (cycles - cyclestart) % cyclelength;
       for (var i = 0; i < remainingCycles; i++) {
         rollRocks(rocks, 'N')
@@ -45,7 +37,6 @@ function part2(cycles) {
         rollRocks(rocks, 'E')
       }
       return rocks
-
     } else {
       cache.set(rk, cycle)
     }
@@ -53,88 +44,46 @@ function part2(cycles) {
   return rocks
 }
 
-
 function calcLoad(rocks) {
   let load = 0
   for (let y = 0; y < rocks.length; y++) {
-    let rocksonline = 0
-    for (let x = 0; x < rocks[y].length; x++) {
-      if (rocks[y][x] == 'O') {
-        rocksonline++
-      }
-    }
+    const rocksonline = rocks[y].filter(r => r == 'O').length
     load += (rocks.length - y) * rocksonline
   }
   return load
 }
 
 function rollRocks(rocks, dir = 'N') {
-  //console.log('Rolling: ', dir)
-  if (dir == 'N') {
+  if (dir == 'N' || dir == 'W') {
     for (let y = 0; y < rocks.length; y++) {
       for (let x = 0; x < rocks[y].length; x++) {
-        rollRock(x, y, dir)
+        rollToStop(rocks, x,y ,dir)
       }
     }
-  } else if (dir == 'W') {
-    for (let y = 0; y < rocks.length; y++) {
-      for (let x = 0; x < rocks[y].length; x++) {
-        rollRock(x, y, dir)
-      }
-    }
-  }
-  else if (dir == 'S') {
+  } else if (dir == 'S' || dir == 'E') {
     for (let y = rocks.length - 1; y >= 0; y--) {
       for (let x = rocks[y].length - 1; x >= 0; x--) {
-        rollRock(x, y, dir)
-      }
-    }
-  }
-  else if (dir == 'E') {
-    for (let y = rocks.length - 1; y >= 0; y--) {
-      for (let x = rocks[y].length - 1; x >= 0; x--) {
-        rollRock(x, y, dir)
+        rollToStop(rocks, x,y ,dir)
       }
     }
   }
 }
 
-function rollRock(x, y, dir) {
-  const [posx, posy] = overPos(x, y, dir)
-  if (rocks[posy] == undefined) {
-    return [x, y]
-  }
-  
-  if (rocks[y][x] == 'O') {
-    const next = rocks[posy][posx]
-    switch (next) {
-      case 'O':
-        return [x, y]
-      case '.':
-        rocks[posy][posx] = 'O'
-        rocks[y][x] = '.'
-        return rollRock(posx, posy, dir)
-      case '#':
-        return [x, y]
-      default:
-        return [x, y]
-    }
+function rollToStop(rocks, x,y ,dir) {
+  if(rocks[y][x] == 'O') {
+    const [stopx, stopy] = stopPos(rocks, x,y,dir)
+    rocks[y][x] = '.'
+    rocks[stopy][stopx] = 'O'
   }
 }
 
-function overPos(x, y, dir) {
-  switch (dir) {
-    case 'N':
-      return [x, y - 1]
-    case 'S':
-      return [x, y + 1]
-    case 'W':
-      return [x - 1, y]
-    case 'E':
-      return [x + 1, y]
-    default:
-      console.error('Unknown dir', dir)
+function stopPos(rocks, x,y, dir) {
+  while(rocks[y+ dirs[dirmap[dir]].y] != undefined && 
+        rocks[y + dirs[dirmap[dir]].y][x + dirs[dirmap[dir]].x] == '.') {
+    x += dirs[dirmap[dir]].x
+    y += dirs[dirmap[dir]].y
   }
+  return [x,y]
 }
 
 function printRocks(rocks) {
