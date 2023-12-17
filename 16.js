@@ -5,7 +5,6 @@ const rawdata = fs.readFileSync(args[0], 'utf8')
 const lines = rawdata.split('\n')
 
 let contraption = []
-let tilecount = new Set()
 lines.forEach(line => {
   contraption.push(line.trim().split(''))
 })
@@ -13,10 +12,11 @@ lines.forEach(line => {
 // dir: N, S, W, E -> 0, 1, 2, 3
 let beams = []
 let tiles = []
-beams[0] = { dir: 3, pos: { x: 0, y: 0 } }
+let tilecount = new Set()
+
+beams[0] = { dir: 3, pos: { x: undefined, y: undefined } }
 let visited = new Set()
-let steps = 0
-while (beams.length > 0 && steps++ < 10000) {
+while (beams.length > 0) {
   for (let i = 0; i < beams.length; i++) {
     const beam = beams[i]
     const pos = beam.pos
@@ -24,21 +24,22 @@ while (beams.length > 0 && steps++ < 10000) {
     if (visited.has(pos.x + ',' + pos.y + '-' + dir)) {
       console.log('Stopping beam', pos.x + ',' + pos.y + '-' + dir)
       beams.splice(i, 1)
-      i--
+      //  i--
       continue
     }
     const next = nextPos(contraption, pos, dir)
+    if (pos.x != undefined && pos.y != undefined) {
+      if (tiles[pos.y] == undefined) tiles[pos.y] = []
+      tiles[pos.y][pos.x] = '#'
 
-    if (tiles[pos.y] == undefined) tiles[pos.y] = []
-    tiles[pos.y][pos.x] = '#'
-
-    tilecount.add(pos.x + ',' + pos.y)
-    visited.add(pos.x + ',' + pos.y + '-' + dir)
+      tilecount.add(pos.x + ',' + pos.y)
+      visited.add(pos.x + ',' + pos.y + '-' + dir)
+    }
 
     if (!next) {
       console.log('Removing beam', pos.x + ',' + pos.y + '-' + dir, beams.length)
       beams.splice(i, 1)
-      i--
+      //  i--
       continue
     } else {
       const nextdir = nextDir(contraption, next, dir)
@@ -51,8 +52,6 @@ while (beams.length > 0 && steps++ < 10000) {
   }
 
 }
-//console.table(tiles)
-console.log('Del 1:', tilecount.size, steps)
 
 function nextDir(contraption, nextpos, dir) {
   let next;
@@ -87,6 +86,9 @@ function nextDir(contraption, nextpos, dir) {
 }
 
 function nextPos(contraption, pos, dir) {
+  if (pos.x == undefined && pos.y == undefined) {
+    return { x: 0, y: 0 }
+  }
   const next = { x: pos.x, y: pos.y }
   switch (dir) {
     case 0: next.y--; break
@@ -94,11 +96,9 @@ function nextPos(contraption, pos, dir) {
     case 2: next.x--; break
     case 3: next.x++; break
   }
-  if (next.y < 0 || next.y >= contraption.length) {
+  if (contraption[next.y] == undefined || !contraption[next.y][next.x]) {
     return false
   }
-  if (next.x < 0 || next.x >= contraption[next.y].length) {
-    return false
-  }
+
   return next
 }
