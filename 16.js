@@ -22,9 +22,7 @@ while (beams.length > 0) {
     const pos = beam.pos
     const dir = beam.dir
     if (visited.has(pos.x + ',' + pos.y + '-' + dir)) {
-      console.log('Stopping beam', pos.x + ',' + pos.y + '-' + dir)
       beams.splice(i, 1)
-      //  i--
       continue
     }
     const next = nextPos(contraption, pos, dir)
@@ -37,9 +35,7 @@ while (beams.length > 0) {
     }
 
     if (!next) {
-      console.log('Removing beam', pos.x + ',' + pos.y + '-' + dir, beams.length)
       beams.splice(i, 1)
-      //  i--
       continue
     } else {
       const nextdir = nextDir(contraption, next, dir)
@@ -52,6 +48,8 @@ while (beams.length > 0) {
   }
 
 }
+
+console.log('Del 1:', tilecount.size)
 
 function nextDir(contraption, nextpos, dir) {
   let next;
