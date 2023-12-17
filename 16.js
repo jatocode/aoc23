@@ -11,45 +11,83 @@ lines.forEach(line => {
 
 // dir: N, S, W, E -> 0, 1, 2, 3
 let beams = []
-let tiles = []
-let tilecount = new Set()
+beams[0] = { dir: 3, pos: { x: -1, y: 0 } }
 
-beams[0] = { dir: 3, pos: { x: undefined, y: undefined } }
-let visited = new Set()
-while (beams.length > 0) {
-  for (let i = 0; i < beams.length; i++) {
-    const beam = beams[i]
-    const pos = beam.pos
-    const dir = beam.dir
-    if (visited.has(pos.x + ',' + pos.y + '-' + dir)) {
-      beams.splice(i, 1)
-      continue
-    }
-    const next = nextPos(contraption, pos, dir)
-    if (pos.x != undefined && pos.y != undefined) {
-      if (tiles[pos.y] == undefined) tiles[pos.y] = []
-      tiles[pos.y][pos.x] = '#'
+const count = energize(beams)
+console.log('Del 1:', count) 
+console.log('Del 2:', findBestEntry())
 
-      tilecount.add(pos.x + ',' + pos.y)
-      visited.add(pos.x + ',' + pos.y + '-' + dir)
-    }
-
-    if (!next) {
-      beams.splice(i, 1)
-      continue
-    } else {
-      const nextdir = nextDir(contraption, next, dir)
-      if (nextdir.length == 2) {
-        beams.push({ pos: next, dir: nextdir[1] })
-      }
-      beam.dir = nextdir[0]
-      beam.pos = next
+function findBestEntry() {
+  let best = 0
+  let bestpos = { x: -1, y: 0 }
+  // E
+  for (let y = 0; y < contraption.length; y++) {
+    const count = energize([{ dir: 3, pos: { x: -1, y: y } }])
+    if (count > best) {
+      best = count
+      bestpos = { x: -1, y: y }
     }
   }
-
+  // W
+  for (let y = 0; y < contraption.length; y++) {
+    const count = energize([{ dir: 2, pos: { x: contraption.length, y: y } }])
+    if (count > best) {
+      best = count
+      bestpos = { x: -1, y: y }
+    }
+  }
+  // S
+  for (let x = 0; x < contraption.length[0]; x++) {
+    const count = energize([{ dir: 1, pos: { x: x, y: -1 } }])
+    if (count > best) {
+      best = count
+      bestpos = { x: -1, y: y }
+    }
+  }
+  // N
+  for (let x = 0; x < contraption.length[0]; x++) {
+    const count = energize([{ dir: 1, pos: { x: x, y: contraption.length + 1 } }])
+    if (count > best) {
+      best = count
+      bestpos = { x: -1, y: y }
+    }
+  }
+  return [best,bestpos]
 }
 
-console.log('Del 1:', tilecount.size)
+function energize(beams) {
+  let tilecount = new Set()
+  let visited = new Set()
+  while (beams.length > 0) {
+    for (let i = 0; i < beams.length; i++) {
+      const beam = beams[i]
+      const pos = beam.pos
+      const dir = beam.dir
+      if (visited.has(pos.x + ',' + pos.y + '-' + dir)) {
+        beams.splice(i, 1)
+        continue
+      }
+      const next = nextPos(contraption, pos, dir)
+      if (pos.x != undefined && pos.y != undefined) {
+        tilecount.add(pos.x + ',' + pos.y)
+        visited.add(pos.x + ',' + pos.y + '-' + dir)
+      }
+
+      if (!next) {
+        beams.splice(i, 1)
+        continue
+      } else {
+        const nextdir = nextDir(contraption, next, dir)
+        if (nextdir.length == 2) {
+          beams.push({ pos: next, dir: nextdir[1] })
+        }
+        beam.dir = nextdir[0]
+        beam.pos = next
+      }
+    }
+  }
+  return tilecount.size -1 // Räkna inte med startpositionen
+}
 
 function nextDir(contraption, nextpos, dir) {
   let next;
@@ -84,9 +122,9 @@ function nextDir(contraption, nextpos, dir) {
 }
 
 function nextPos(contraption, pos, dir) {
-  if (pos.x == undefined && pos.y == undefined) {
-    return { x: 0, y: 0 }
-  }
+  // if (pos.x == undefined && pos.y == undefined) {
+  //   return { x: 0, y: 0 }
+  // }
   const next = { x: pos.x, y: pos.y }
   switch (dir) {
     case 0: next.y--; break
