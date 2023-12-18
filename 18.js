@@ -12,14 +12,20 @@ lines.forEach(line => {
     digplan.push({ d: m[1], n: parseInt(m[2]), col: m[3] })
   }
 })
-console.table(digplan)
+//console.table(digplan)
 
-dig(digplan, trenches)
-console.log('Del 1:', countInside(trenches))
-printTrenches(trenches)
+const bounds = dig(digplan, trenches)
+//printTrenches(trenches, bounds)
+
+const count = countInside(trenches, bounds)
+printTrenches(trenches, bounds)
+
+console.log('Del 1:', count)
 
 function dig(digplan, trenches) {
   const pos = { x: 0, y: 0 }
+  let minx = 0
+  let miny = 0
   digplan.forEach(plan => {
     const heading = plan.d
     const n = plan.n
@@ -41,40 +47,49 @@ function dig(digplan, trenches) {
       }
       if (trenches[pos.y] === undefined) trenches[pos.y] = []
       trenches[pos.y][pos.x] = '#'
+      minx = Math.min(minx, pos.x)
+      miny = Math.min(miny, pos.y)
     }
   })
+  return [minx, miny]
 }
 
-function countInside(trenches) {
+function countInside(trenches, bounds) {
+  const minx = bounds[0]
+  const miny = bounds[1]
   let count = 0
   const maxx = trenches.reduce((max, row) => Math.max(max, row.length), 0)
-  for (let y = 0; y < trenches.length; y++) {
+  for (let y = miny; y < trenches.length; y++) {
     let countit = 1
     let countrow = 0
-    for (let x = 0; x < maxx; x++) {
-      if (trenches[y][x] === '#') {
-        countrow++
-        count++
+    for (let x = minx; x < maxx; x++) {
+      if( (trenches[y][x] === '#') && (trenches[y][x-1] != '#') ) {
         countit++
+      }
+
+      if (trenches[y][x] === '#') {
+        count++
       } else if (countit % 2 == 0) {
-        console.log(y, x, countit, countrow)
-        //trenches[y][x] = 'X'
+        //console.log(y, x, countit, countrow)
+        trenches[y][x] = 'X'
         count++
         countrow++
       }
 
     }
-    console.log(y, 'countrow', countrow)
+    //console.log(y, 'countrow', countrow)
   }
   return count
 }
 
 function printTrenches(trenches) {
+  const minx = bounds[0]
+  const miny = bounds[1]
   const maxx = trenches.reduce((max, row) => Math.max(max, row.length), 0)
-  for (let y = 0; y < trenches.length; y++) {
+  for (let y = miny; y < trenches.length; y++) {
     let row = ''
-    for (let x = 0; x < maxx; x++) {
-      row += trenches[y][x] ? '#' : '.'
+    for (let x = minx; x < maxx; x++) {
+      row += trenches[y][x] ? trenches[y][x] : '.'
     }
     console.log(row)
   }
