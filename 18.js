@@ -13,12 +13,13 @@ lines.forEach(line => {
   }
 })
 //console.table(digplan)
+const countrows = []
 
 const bounds = dig(digplan, trenches)
-//printTrenches(trenches, bounds)
+printTrenches(trenches, bounds)
 
 const count = countInside(trenches, bounds)
-printTrenches(trenches, bounds)
+printTrenches(trenches, bounds, countrows)
 
 console.log('Del 1:', count)
 
@@ -60,7 +61,7 @@ function countInside(trenches, bounds) {
   let count = 0
   const maxx = trenches.reduce((max, row) => Math.max(max, row.length), 0)
   for (let y = miny; y < trenches.length; y++) {
-    let countit = 1
+    let countit = 0
     let countrow = 0
     for (let x = minx; x < maxx; x++) {
       if( (trenches[y][x] === '#') && (trenches[y][x-1] != '#') ) {
@@ -69,7 +70,7 @@ function countInside(trenches, bounds) {
 
       if (trenches[y][x] === '#') {
         count++
-      } else if (countit % 2 == 0) {
+      } else if (countit % 2 != 0) {
         //console.log(y, x, countit, countrow)
         trenches[y][x] = 'X'
         count++
@@ -78,6 +79,7 @@ function countInside(trenches, bounds) {
 
     }
     //console.log(y, 'countrow', countrow)
+    countrows[y] = countit
   }
   return count
 }
@@ -91,6 +93,6 @@ function printTrenches(trenches) {
     for (let x = minx; x < maxx; x++) {
       row += trenches[y][x] ? trenches[y][x] : '.'
     }
-    console.log(row)
+    console.log(row + ' ') // + countrows[y] != undefined ? countrows[y] : '0')
   }
 }
