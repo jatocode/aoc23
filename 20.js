@@ -7,9 +7,7 @@ const lines = rawdata.split('\n')
 let data = []
 const broadcastmodule = { name: 'broadcast', dest: [], mem: new Map() }
 data.push(broadcastmodule)
-let pulses = []
-let lowpulse = 0
-let highpulse = 0
+data.push({ name: 'button', op: '%', dest: ['b', 'c'], val: 0, mem: new Map() })
 
 for (let i = 0; i < lines.length; i++) {
   const line = lines[i]
@@ -23,14 +21,18 @@ for (let i = 0; i < lines.length; i++) {
   }
 }
 
-for (let i = 0; i < 1000; i++) {
+let pulses = []
+let lowpulse = 0
+let highpulse = 0
+for (let i = 0; i < 1; i++) {
   pushButton()
+  //console.table(data)
+  //console.log(lowpulse, highpulse)
 }
-console.log('lowpulse', lowpulse)
-console.log('highpulse', highpulse)
-console.log('Del 1:', (lowpulse ) * (highpulse ))
+console.log('Del 1:', lowpulse * highpulse, 'lp=', lowpulse, 'hp=', highpulse)
 
 function pushButton() {
+  console.log('button -low- -> broadcaster')
   pulses.push({ dest: 'broadcast', pulse: 0 })
   lowpulse++
   while (pulses.length > 0) {
@@ -40,6 +42,7 @@ function pushButton() {
       generatePulses(pulse.pulse, module)
     }
   }
+  console.table(data)
 }
 
 function generatePulses(pulse, module) {
@@ -54,7 +57,7 @@ function generatePulses(pulse, module) {
     case '%':
       if (pulse == 0) {
         output = flipflop(pulse, module.val)
-        module.val = output
+        module.val = pulse
         sendpulse = true
       }
       break
@@ -67,11 +70,11 @@ function generatePulses(pulse, module) {
 
   if (sendpulse) {
     module.dest.forEach(d => {
-      //console.log(module.name, ' ' + output == 0 ? '-low-' : '-high-' + ' -> ', d)
       updateMem(d, module, output)
       pulses.push({ dest: d, pulse: output })
-      lowpulse += output === 0 ? 1 : 0
-      highpulse += output === 1 ? 1 : 0
+      lowpulse += (output === 0 ? 1 : 0)
+      highpulse += (output === 1 ? 1 : 0)
+      console.log(module.name, ' ' + output == 0 ? '-low-' : '-high-' + ' -> ', d, lowpulse, highpulse)
     })
   }
 }
@@ -84,6 +87,7 @@ function updateMem(destname, module, val) {
 }
 
 function conjunction(module) {
+  console.log('conjunction', module.name, module.mem)
   if (module.mem.size === 0) {
     return 1
   }
